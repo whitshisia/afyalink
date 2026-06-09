@@ -1,0 +1,80 @@
+.
+├── LICENSE
+├── README.md
+├── backend
+│   ├── Dockerfile
+│   ├── afyalink-api
+│   │   ├── alembic
+│   │   ├── app
+│   │   │   ├── api
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── appointments.py
+│   │   │   │   ├── auth.py
+│   │   │   │   ├── doctors.py
+│   │   │   │   ├── payments.py
+│   │   │   │   ├── records.py
+│   │   │   │   └── users.py
+│   │   │   ├── core
+│   │   │   │   ├── config.py
+│   │   │   │   ├── dependencies.py
+│   │   │   │   └── security.py
+│   │   │   ├── database.py
+│   │   │   ├── env.py
+│   │   │   ├── main.py
+│   │   │   ├── modelsa
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── appointment.py
+│   │   │   │   ├── doctor.py
+│   │   │   │   ├── record.py
+│   │   │   │   ├── refresh_token.py
+│   │   │   │   └── user.py
+│   │   │   ├── schemas
+│   │   │   │   ├── appointment.py
+│   │   │   │   ├── auth.py
+│   │   │   │   ├── doctor.py
+│   │   │   │   └── user.py
+│   │   │   └── services
+│   │   │       ├── auth_service.py
+│   │   │       ├── email_service.py
+│   │   │       └── mpesa_stub.py
+│   │   └── venv
+└── frontend
+    └── afyalink-app
+        ├── README.md
+        ├── eslint.config.js
+        ├── index.html
+        ├── package-lock.json
+        ├── package.json
+        ├── public
+        │   ├── favicon.svg
+        │   ├── icons
+        │   └── icons.svg
+        ├── src
+        │   ├── App.css
+        │   ├── App.jsx
+        │   ├── api
+        │   │   ├── authAPI.js
+        │   │   └── axiosClient.js
+        │   ├── assets
+        │   │   ├── hero.png
+        │   │   ├── react.svg
+        │   │   └── vite.svg
+        │   ├── components
+        │   │   ├── AppLayout.jsx
+        │   │   ├── Navbar.jsx
+        │   │   └── ProtectedRoute.jsx
+        │   ├── index.css
+        │   ├── main.jsx
+        │   ├── pages
+        │   │   ├── Login.jsx
+        │   │   ├── Register.jsx
+        │   │   ├── patient
+        │   │   │   └── Dasboard.jsx
+        │   │   └── provider
+        │   │       └── Dasboard.jsx
+        │   └── store
+        │       └── authStore.js
+        ├── tailwind.config.js
+        ├── vercel.json
+        └── vite.config.js
+
