@@ -1,34 +1,17 @@
-import uuid
-from datetime import datetime, timezone
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
+from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from app.database import Base
-
+from ..database import Base
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False, index=True,
-    )
-    token = Column(Text, unique=True, nullable=False, index=True)
+    
+    id = Column(Integer, primary_key=True, index=True)
+    token = Column(String(500), unique=True, nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     expires_at = Column(DateTime(timezone=True), nullable=False)
-    is_revoked = Column(Boolean, default=False, nullable=False)
-    created_at = Column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False,
-    )
-
+    is_revoked = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relationships
     user = relationship("User", back_populates="refresh_tokens")
-
-    @property
-    def is_expired(self) -> bool:
-        return datetime.now(timezone.utc) > self.expires_at
-
-    @property
-    def is_valid(self) -> bool:
-        return not self.is_revoked and not self.is_expired

@@ -1,0 +1,20 @@
+cat > .dockerignore << 'EOF'
+.git
+.gitignore
+README.md
+.env.example
+*.pyc
+__pycache__
+*.log
+*.sql
+*.dump
+node_modules
+.venv
+venv
+env
+.vscode
+.idea
+*.md
+.git/
+.github/
+EOF

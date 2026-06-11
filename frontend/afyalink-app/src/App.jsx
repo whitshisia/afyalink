@@ -1,133 +1,99 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { ProtectedRoute, GuestRoute } from "../src/components/ProtectedRoute";
-import AppLayout from "../src/components/AppLayout";
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom'; // Fixed: Removed BrowserRouter/Router import
+import { useAuthStore } from './store/authStore';
+import { initOfflineSync } from './services/offlineSync';
+import Layout from './components/Layout/Layout';
+import PWAInstallPrompt from './components/Common/PWAInstallPrompt';
+import ProtectedRoute from './components/Common/ProtectedRoute';
 
-import Home from "../src/pages/Home";
-import Login from "../src/pages/Login";
-import Register from "../src/pages/Register";
+// Page Imports
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import Dashboard from './pages/Dashboard/Dashboard';
+import PatientDashboard from './pages/Dashboard/PatientDashboard';
+import ProviderDashboard from './pages/Dashboard/ProviderDashboard';
+import AdminDashboard from './pages/Dashboard/AdminDashboard';
+import BookAppointment from './pages/Appointments/BookAppointment';
+import MyAppointments from './pages/Appointments/MyAppointments';
+import MyRecords from './pages/MedicalRecords/MyRecords';
+import MyPrescriptions from './pages/Prescriptions/MyPrescriptions';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import PricingPage from './pages/PricingPage';
+import DemoPage from './pages/DemoPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 
-import PatientDashboard from "../src/pages/patient/Dasboard";
-import ProviderDashboard from "../src/pages/provider/Dasboard";
+function App() {
+  const { loadUser } = useAuthStore();
 
-function NotFound() {
+  useEffect(() => {
+    loadUser();
+    initOfflineSync();
+  }, []);
+
   return (
-    <div className="min-h-screen flex items-center justify-center text-center p-6">
-      <div>
-        <div className="text-6xl font-display font-bold text-gray-200 mb-4">
-          404
-        </div>
-        <h1 className="text-xl font-semibold text-gray-900 mb-2">
-          Page not found
-        </h1>
-        <p className="text-gray-500 mb-6">
-          This page doesn't exist or has moved.
-        </p>
-        <a href="/" className="btn btn-primary btn-md">
-          Go home
-        </a>
-      </div>
-    </div>
+    <> {/* Fixed: Replaced <Router> with a clean React Fragment */}
+      <PWAInstallPrompt />
+      
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Layout><HomePage /></Layout>} />
+        <Route path="/login" element={<Layout><LoginPage /></Layout>} />
+        <Route path="/signup" element={<Layout><SignupPage /></Layout>} />
+        <Route path="/register" element={<Navigate to="/signup" replace />} />
+        <Route path="/about" element={<Layout><AboutPage /></Layout>} />
+        <Route path="/contact" element={<Layout><ContactPage /></Layout>} />
+        <Route path="/pricing" element={<Layout><PricingPage /></Layout>} />
+        <Route path="/demo" element={<Layout><DemoPage /></Layout>} />
+        <Route path="/terms" element={<Layout><TermsPage /></Layout>} />
+        <Route path="/privacy" element={<Layout><PrivacyPage /></Layout>} />
+        
+        {/* Protected Routes */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Layout><Dashboard /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/patient/dashboard" element={
+          <ProtectedRoute allowedRoles={['patient']}>
+            <Layout><PatientDashboard /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/provider/dashboard" element={
+          <ProtectedRoute allowedRoles={['doctor']}>
+            <Layout><ProviderDashboard /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/dashboard" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <Layout><AdminDashboard /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/appointments/book" element={
+          <ProtectedRoute>
+            <Layout><BookAppointment /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/appointments" element={
+          <ProtectedRoute>
+            <Layout><MyAppointments /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/records" element={
+          <ProtectedRoute>
+            <Layout><MyRecords /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/prescriptions" element={
+          <ProtectedRoute>
+            <Layout><MyPrescriptions /></Layout>
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </>
   );
 }
 
-export default function App() {
-  return (
-    <Routes>
-      {/* ✅ Public Home */}
-      <Route path="/" element={<Home />} />
-
-      {/* ✅ Guest-only routes */}
-      <Route element={<GuestRoute />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Route>
-
-      {/* ✅ Patient Protected Routes */}
-      <Route element={<ProtectedRoute allowedRoles={["patient", "admin"]} />}>
-        <Route element={<AppLayout />}>
-          <Route path="/dashboard" element={<PatientDashboard />} />
-          <Route
-            path="/find-doctors"
-            element={
-              <div className="p-8 text-center text-gray-500">
-                Find Doctors — Day 3
-              </div>
-            }
-          />
-          <Route
-            path="/appointments"
-            element={
-              <div className="p-8 text-center text-gray-500">
-                Appointments — Day 4
-              </div>
-            }
-          />
-          <Route
-            path="/records"
-            element={
-              <div className="p-8 text-center text-gray-500">
-                Health Records — Day 6
-              </div>
-            }
-          />
-          <Route
-            path="/prescriptions"
-            element={
-              <div className="p-8 text-center text-gray-500">
-                Prescriptions — Day 9
-              </div>
-            }
-          />
-          <Route
-            path="/health"
-            element={
-              <div className="p-8 text-center text-gray-500">
-                Health Summary — Day 10
-              </div>
-            }
-          />
-        </Route>
-      </Route>
-
-      {/* ✅ Provider Protected Routes */}
-      <Route element={<ProtectedRoute allowedRoles={["doctor", "admin"]} />}>
-        <Route element={<AppLayout />}>
-          <Route path="/provider" element={<ProviderDashboard />} />
-          <Route
-            path="/provider/appointments"
-            element={
-              <div className="p-8 text-center text-gray-500">
-                Appointments — Day 5
-              </div>
-            }
-          />
-          <Route
-            path="/provider/patients"
-            element={
-              <div className="p-8 text-center text-gray-500">
-                Patients — Day 5
-              </div>
-            }
-          />
-        </Route>
-      </Route>
-
-      {/* ✅ Admin Protected Routes */}
-      <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-        <Route element={<AppLayout />}>
-          <Route
-            path="/admin"
-            element={
-              <div className="p-8 text-center text-gray-500">
-                Admin — Day 11
-              </div>
-            }
-          />
-        </Route>
-      </Route>
-
-      {/* ❌ 404 fallback */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
-  );
-}
+export default App;

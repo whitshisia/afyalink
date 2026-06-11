@@ -1,50 +1,41 @@
-from pydantic import BaseModel, EmailStr, field_validator
-from typing import Optional
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from uuid import UUID
-from app.models.user import UserRole
+from typing import Optional
+from enum import Enum
 
+class UserRole(str, Enum):
+    PATIENT = "patient"
+    DOCTOR = "doctor"
+    ADMIN = "admin"
+
+class UserStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    SUSPENDED = "suspended"
+    PENDING_VERIFICATION = "pending_verification"
 
 class UserBase(BaseModel):
     email: EmailStr
-    full_name: str
-    phone: Optional[str] = None
-
+    phone: str = Field(..., pattern=r'^\+?[0-9]{10,15}$')
+    full_name: str = Field(..., min_length=2, max_length=255)
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(..., min_length=8)
     role: UserRole = UserRole.PATIENT
 
-    @field_validator("password")
-    @classmethod
-    def password_strength(cls, v):
-        if len(v) < 8:
-            raise ValueError("Password must be at least 8 characters")
-        return v
-
+class UserResponse(UserBase):
+    id: int
+    role: UserRole
+    status: UserStatus
+    is_verified: bool
+    profile_image: Optional[str] = None
+    created_at: datetime
+    last_login: Optional[datetime] = None
+    
+    class Config:
+        from_attributes = True
 
 class UserUpdate(BaseModel):
-    full_name: Optional[str] = None
-    phone: Optional[str] = None
-    avatar_url: Optional[str] = None
-
-
-class UserOut(UserBase):
-    id: UUID
-    role: UserRole
-    is_active: bool
-    is_verified: bool
-    avatar_url: Optional[str]
-    created_at: datetime
-
-    model_config = {"from_attributes": True}
-
-
-class UserOutPublic(BaseModel):
-    """Safe public profile — no sensitive fields."""
-    id: UUID
-    full_name: str
-    avatar_url: Optional[str]
-    role: UserRole
-
-    model_config = {"from_attributes": True}
+    full_name: Optional[str] = Field(None, min_length=2, max_length=255)
+    phone: Optional[str] = Field(None, pattern=r'^\+?[0-9]{10,15}$')
+    profile_image: Optional[str] = None

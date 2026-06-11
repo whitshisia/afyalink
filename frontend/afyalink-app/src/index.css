@@ -1,47 +1,45 @@
 @import "tailwindcss";
 
-/* optional but recommended base setup */
-@layer base {
-  html {
-    font-family: Inter, system-ui, sans-serif;
+@theme {
+  /* Core Brand Colors Definition */
+  --color-brand-50: #edfbf3;
+  --color-brand-100: #c4f5dc;
+  --color-brand-200: #8eedc0;
+  --color-brand-300: #4fdd9a;
+  --color-brand-400: #25c87c;
+  --color-brand-500: #16a863;
+  --color-brand-600: #118a52;
+  --color-brand-700: #0c6b40;
+  --color-brand-800: #084d2e;
+  --color-brand-900: #052e1c;
+  --color-brand-950: #021a11;
+
+  /* Theme Fonts Definition */
+  --font-display: "Sora", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+
+  /* Core System Animations */
+  --animate-fade-up: fadeUp 0.7s ease-out both;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-ticker: ticker 22s linear infinite;
+  --animate-pulse-ring: pulseRing 2s infinite;
+
+  /* Animation Keyframes Mapping */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-}
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-@keyframes ticker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22,168,99,0.4); }
-  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(22,168,99,0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22,168,99,0); }
-}
-
-.animate-pulse-ring {
-  animation: pulse-ring 2s infinite;
-}
-
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.font-display {
-  font-family: 'Sora', sans-serif;
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes pulseRing {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22,168,99,0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(22,168,99,0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22,168,99,0); }
+  }
 }

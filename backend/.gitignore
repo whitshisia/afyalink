@@ -1,0 +1,13 @@
+# Secrets
+.env
+*.env
+# Python virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class

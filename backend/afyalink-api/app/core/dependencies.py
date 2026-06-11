@@ -1,58 +1,68 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.core.security import decode_token
-from app.models.user import User, UserRole
+from typing import Optional
+from ..database import get_db
+from ..models.user import User
+from .security import decode_token
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+security = HTTPBearer()
 
-
-def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db),
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
 ) -> User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    """Get current authenticated user"""
+    token = credentials.credentials
     payload = decode_token(token)
-    if payload is None or payload.get("type") != "access":
-        raise credentials_exception
-
-    user_id: str = payload.get("sub")
-    if user_id is None:
-        raise credentials_exception
-
-    user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
-    if user is None:
-        raise credentials_exception
+    
+    if not payload or payload.get("type") != "access":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+        )
+    
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
+    
+    if user.status != "active":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is not active",
+        )
+    
     return user
 
-
-def get_current_patient(current_user: User = Depends(get_current_user)) -> User:
-    if current_user.role not in (UserRole.PATIENT, UserRole.ADMIN):
+async def get_current_active_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Get current active user"""
+    if current_user.status != "active":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Patient access required",
+            detail="Inactive user"
         )
     return current_user
 
-
-def get_current_doctor(current_user: User = Depends(get_current_user)) -> User:
-    if current_user.role not in (UserRole.DOCTOR, UserRole.ADMIN):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Doctor access required",
-        )
-    return current_user
-
-
-def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
-    if current_user.role != UserRole.ADMIN:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required",
-        )
-    return current_user
+def role_required(*allowed_roles):
+    """Role-based access control decorator"""
+    async def role_checker(current_user: User = Depends(get_current_active_user)):
+        if current_user.role not in allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Role {current_user.role} not authorized for this operation"
+            )
+        return current_user
+    return role_checker

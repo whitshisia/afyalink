@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're Offline - AfyaLink</title>
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .offline-container {
+      text-align: center;
+      padding: 2rem;
+      max-width: 500px;
+    }
+    .offline-card {
+      background: white;
+      border-radius: 24px;
+      padding: 3rem 2rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    .offline-icon {
+      width: 80px;
+      height: 80px;
+      background: #fef3c7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    h1 {
+      font-size: 1.75rem;
+      color: #111815;
+      margin-bottom: 1rem;
+    }
+    p {
+      color: #56705f;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    button {
+      background: #16a863;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #118a52;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-card">
+      <div class="offline-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <h1>You're Offline</h1>
+      <p>Don't worry! You can still access your cached medical information and continue using AfyaLink. Once you're back online, all your data will sync automatically.</p>
+      <button onclick="window.location.reload()">Try Again</button>
+    </div>
+  </div>
+</body>
+</html>

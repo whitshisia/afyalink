@@ -1,15 +1,10 @@
-import uuid
-from datetime import datetime, timezone
-from enum import Enum as PyEnum
-from sqlalchemy import (
-    Column, String, Boolean, DateTime, Float, Text, ForeignKey, Enum
-)
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, Integer, DateTime, ForeignKey, String, Text, Float, Enum, Boolean
+from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from app.database import Base
+import enum
+from ..database import Base
 
-
-class AppointmentStatus(str, PyEnum):
+class AppointmentStatus(str, enum.Enum):
     PENDING = "pending"
     CONFIRMED = "confirmed"
     IN_PROGRESS = "in_progress"
@@ -17,56 +12,39 @@ class AppointmentStatus(str, PyEnum):
     CANCELLED = "cancelled"
     NO_SHOW = "no_show"
 
-
-class AppointmentType(str, PyEnum):
-    ONLINE = "online"
+class AppointmentType(str, enum.Enum):
     IN_PERSON = "in_person"
-
+    VIDEO = "video"
+    PHONE = "phone"
 
 class Appointment(Base):
     __tablename__ = "appointments"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    patient_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False, index=True,
-    )
-    doctor_id = Column(
-        UUID(as_uuid=True), ForeignKey("doctors.id", ondelete="CASCADE"),
-        nullable=False, index=True,
-    )
-    scheduled_at = Column(DateTime(timezone=True), nullable=False)
-    duration_minutes = Column(Float, default=30.0)
-    appointment_type = Column(
-        Enum(AppointmentType), default=AppointmentType.ONLINE, nullable=False
-    )
-    status = Column(
-        Enum(AppointmentStatus), default=AppointmentStatus.PENDING, nullable=False
-    )
+    
+    id = Column(Integer, primary_key=True, index=True)
+    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
+    doctor_id = Column(Integer, ForeignKey("doctors.id"), nullable=False)
+    scheduled_time = Column(DateTime(timezone=True), nullable=False)
+    duration_minutes = Column(Integer, default=30)
+    appointment_type = Column(Enum(AppointmentType), default=AppointmentType.VIDEO)
+    status = Column(Enum(AppointmentStatus), default=AppointmentStatus.PENDING)
     reason = Column(Text, nullable=True)
-    notes = Column(Text, nullable=True)  # Doctor notes
-    fee = Column(Float, nullable=True)
-    is_paid = Column(Boolean, default=False)
-    video_link = Column(String(500), nullable=True)
-    created_at = Column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False,
-    )
-    updated_at = Column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
-        nullable=False,
-    )
-
+    symptoms = Column(Text, nullable=True)
+    notes = Column(Text, nullable=True)
+    prescription_notes = Column(Text, nullable=True)
+    video_meeting_link = Column(String(500), nullable=True)
+    cancellation_reason = Column(Text, nullable=True)
+    cancelled_by = Column(String(50), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
     # Relationships
-    patient = relationship(
-        "User", foreign_keys=[patient_id], back_populates="patient_appointments"
+    patient = relationship("Patient", back_populates="appointments", foreign_keys=[patient_id])
+    doctor = relationship("Doctor", back_populates="appointments", foreign_keys=[doctor_id])
+    payment = relationship("Payment", back_populates="appointment", uselist=False)
+    
+    # FIX: Updated back_populates to exactly match the attribute on the MedicalRecord class
+    medical_records = relationship(
+        "MedicalRecord", 
+        back_populates="appointment", 
+        uselist=False
     )
-    doctor = relationship(
-        "Doctor", foreign_keys=[doctor_id], back_populates="appointments"
-    )
-
-    def __repr__(self):
-        return f"<Appointment {self.id} — {self.status}>"

@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: afyalink_postgres
+    environment:
+      POSTGRES_USER: afyalink_user
+      POSTGRES_PASSWORD: afyalink_pass
+      POSTGRES_DB: afyalink_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - afyalink_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: afyalink_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - afyalink_network
+
+  backend:
+    build: ./backend
+    container_name: afyalink_backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://afyalink_user:afyalink_pass@postgres:5432/afyalink_db
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+    networks:
+      - afyalink_network
+
+networks:
+  afyalink_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

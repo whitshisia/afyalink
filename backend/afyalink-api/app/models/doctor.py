@@ -1,55 +1,70 @@
-import uuid
-from datetime import datetime, timezone
-from sqlalchemy import (
-    Column, String, Boolean, DateTime, Float, Integer, Text, ForeignKey, ARRAY
-)
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Float, Boolean, Enum, Table
+from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from app.database import Base
+import enum
+from ..database import Base
 
+class DoctorStatus(str, enum.Enum):
+    AVAILABLE = "available"
+    BUSY = "busy"
+    ON_LEAVE = "on_leave"
+    OFFLINE = "offline"
+
+class DoctorSpecialization(str, enum.Enum):
+    GENERAL_PHYSICIAN = "general_physician"
+    CARDIOLOGIST = "cardiologist"
+    DERMATOLOGIST = "dermatologist"
+    PEDIATRICIAN = "pediatrician"
+    GYNECOLOGIST = "gynecologist"
+    NEUROLOGIST = "neurologist"
+    ORTHOPEDIC = "orthopedic"
+    PSYCHIATRIST = "psychiatrist"
+    OPHTHALMOLOGIST = "ophthalmologist"
+    DENTIST = "dentist"
+    PHYSIOTHERAPIST = "physiotherapist"
+    NUTRITIONIST = "nutritionist"
+
+class Specialization(Base):
+    __tablename__ = "specializations"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), unique=True, nullable=False)
+    description = Column(Text)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+# Association table for many-to-many relationship between doctors and specializations
+doctor_specializations = Table(
+    "doctor_specializations",
+    Base.metadata,
+    Column("doctor_id", Integer, ForeignKey("doctors.id")),
+    Column("specialization_id", Integer, ForeignKey("specializations.id"))
+)
 
 class Doctor(Base):
     __tablename__ = "doctors"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    user_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
-        unique=True, nullable=False, index=True,
-    )
-    specialty = Column(String(200), nullable=False)
-    sub_specialty = Column(String(200), nullable=True)
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    license_number = Column(String(50), unique=True, nullable=False)
+    years_of_experience = Column(Integer, default=0)
+    consultation_fee = Column(Float, nullable=False, default=0)
+    hospital_affiliation = Column(String(255), nullable=True)
+    clinic_address = Column(String(500), nullable=True)
     bio = Column(Text, nullable=True)
-    kmpdc_number = Column(String(50), unique=True, nullable=True)
-    years_experience = Column(Integer, default=0)
-    consultation_fee = Column(Float, default=500.0)  # KES
-    location = Column(String(200), nullable=True)
-    city = Column(String(100), nullable=True, index=True)
-    languages = Column(ARRAY(String), default=["English", "Swahili"])
+    education = Column(Text, nullable=True)
+    languages = Column(String(255), nullable=True)
     rating = Column(Float, default=0.0)
-    rating_count = Column(Integer, default=0)
-    is_verified = Column(Boolean, default=False, nullable=False)
-    is_available = Column(Boolean, default=True, nullable=False)
-    accepts_online = Column(Boolean, default=True)
-    accepts_in_person = Column(Boolean, default=True)
-    created_at = Column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False,
-    )
-    updated_at = Column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
-        nullable=False,
-    )
-
+    total_reviews = Column(Integer, default=0)
+    status = Column(Enum(DoctorStatus), default=DoctorStatus.AVAILABLE)
+    is_verified = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
     # Relationships
     user = relationship("User", back_populates="doctor_profile")
-    appointments = relationship(
-        "Appointment",
-        foreign_keys="Appointment.doctor_id",
-        back_populates="doctor",
-    )
-
-    def __repr__(self):
-        return f"<Doctor {self.specialty} — {self.user_id}>"
+    appointments = relationship("Appointment", back_populates="doctor", foreign_keys="Appointment.doctor_id")
+    specializations = relationship("Specialization", secondary=doctor_specializations, back_populates="doctors")
+    reviews = relationship("Review", back_populates="doctor")
+    prescriptions = relationship("Prescription", back_populates="doctor")
+    medical_records = relationship("MedicalRecord", back_populates="doctor")
+Specialization.doctors = relationship("Doctor", secondary=doctor_specializations, back_populates="specializations")
