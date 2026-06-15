@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Calendar, 
   Clock, 
+  DollarSign,
   User, 
   Mail, 
   Phone, 

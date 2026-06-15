@@ -13,7 +13,7 @@ import SignupPage from './pages/SignupPage';
 import Dashboard from './pages/Dashboard/Dashboard';
 import PatientDashboard from './pages/Dashboard/PatientDashboard';
 import ProviderDashboard from './pages/Dashboard/ProviderDashboard';
-import AdminDashboard from './pages/Dashboard/AdminDashboard';
+// import AdminDashboard from './pages/Dashboard/AdminDashboard';
 import BookAppointment from './pages/Appointments/BookAppointment';
 import MyAppointments from './pages/Appointments/MyAppointments';
 import AppointmentDetails from './pages/Appointments/AppointmentDetails';
@@ -35,7 +35,8 @@ import BlogPage from './pages/BlogPage';
 import ProfileSettings from './pages/Profile/ProfileSettings';
 import ChangePassword from './pages/Profile/ChangePassword';
 import NotificationSettings from './pages/Profile/NotificationSettings';
-
+import AdminLogin from './pages/Admin/AdminLogin';
+import AdminDashboard from './pages/Admin/AdminDashboard';
 function App() {
   const { loadUser } = useAuthStore();
 
@@ -64,6 +65,8 @@ function App() {
         <Route path="/cookies" element={<Layout><CookiesPage /></Layout>} />
         <Route path="/careers" element={<Layout><CareersPage /></Layout>} />
         <Route path="/blog" element={<Layout><BlogPage /></Layout>} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
         
         {/* Protected Dashboard Routes */}
         <Route path="/dashboard" element={
@@ -81,11 +84,11 @@ function App() {
             <Layout><ProviderDashboard /></Layout>
           </ProtectedRoute>
         } />
-        <Route path="/admin/dashboard" element={
+        {/* <Route path="/admin/dashboard" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <Layout><AdminDashboard /></Layout>
           </ProtectedRoute>
-        } />
+        } /> */}
         
         {/* Appointment Routes */}
         <Route path="/appointments/book" element={

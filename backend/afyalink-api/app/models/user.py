@@ -14,6 +14,7 @@ class UserStatus(str, enum.Enum):
     INACTIVE = "inactive"
     SUSPENDED = "suspended"
     PENDING_VERIFICATION = "pending_verification"
+    PENDING_ADMIN_APPROVAL = "pending_admin_approval"  # Make sure this exists
 
 class User(Base):
     __tablename__ = "users"
@@ -23,8 +24,24 @@ class User(Base):
     phone = Column(String(20), unique=True, index=True, nullable=False)
     full_name = Column(String(255), nullable=False)
     hashed_password = Column(String(255), nullable=False)
-    role = Column(Enum(UserRole), default=UserRole.PATIENT, nullable=False)
-    status = Column(Enum(UserStatus), default=UserStatus.PENDING_VERIFICATION)
+    role = Column(
+        Enum(
+            UserRole,
+            values_callable=lambda x: [e.value for e in x],
+            name="userrole"
+        ),
+        default=UserRole.PATIENT,
+        nullable=False
+    )
+    
+    status = Column(
+        Enum(
+            UserStatus,
+            values_callable=lambda x: [e.value for e in x],
+            name="userstatus"
+        ),
+        default=UserStatus.PENDING_VERIFICATION
+    )
     is_verified = Column(Boolean, default=False)
     profile_image = Column(String(500), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

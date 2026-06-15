@@ -36,26 +36,45 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     
     # Create user
     hashed_password = get_password_hash(user_data.password)
+    
+    # Set status based on role
+    if user_data.role == "doctor":
+        status = UserStatus.PENDING_ADMIN_APPROVAL  # Changed from PENDING_VERIFICATION
+    else:
+        status = UserStatus.PENDING_VERIFICATION
+    
     db_user = User(
         email=user_data.email,
         phone=user_data.phone,
         full_name=user_data.full_name,
         hashed_password=hashed_password,
         role=user_data.role,
-        status=UserStatus.PENDING_VERIFICATION
+        status=status  # Use the conditional status
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     
-    # Create patient profile if role is patient
+    # Create role-specific profile
     if user_data.role == "patient":
         patient = Patient(user_id=db_user.id)
         db.add(patient)
         db.commit()
+    elif user_data.role == "doctor":
+        # Create doctor profile (you'll need to add this)
+        from ..models.doctor import Doctor
+        doctor = Doctor(
+            user_id=db_user.id,
+            license_number=f"PENDING_{db_user.id}",
+            consultation_fee=0,
+            is_verified=False
+        )
+        db.add(doctor)
+        db.commit()
     
-    # Send verification email
-    await send_verification_email(db_user.email, db_user.id)
+    # Send verification email only for patients
+    if user_data.role == "patient":
+        await send_verification_email(db_user.email, db_user.id)
     
     return db_user
 
@@ -78,7 +97,7 @@ async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
         )
     
     # Check if account is active
-    if user.status == "suspended":
+    if user.status == UserStatus.SUSPENDED:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Account has been suspended"

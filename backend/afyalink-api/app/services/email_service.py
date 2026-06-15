@@ -343,6 +343,81 @@ class EmailService:
         """
         
         return await self.send_email(email, "Payment Receipt - AfyaLink", html_content)
+    
+    
+async def send_doctor_approval_email(self, email: str, full_name: str) -> bool:
+    """Send email to doctor when approved"""
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Account Approved - AfyaLink</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: #16a863; color: white; padding: 20px; text-align: center; }}
+            .content {{ padding: 30px; background: #f9f9f9; }}
+            .button {{ background: #16a863; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Welcome to AfyaLink, Dr. {full_name}!</h1>
+            </div>
+            <div class="content">
+                <p>Congratulations! Your application to join AfyaLink as a healthcare provider has been <strong>approved</strong>.</p>
+                <p>You can now:</p>
+                <ul>
+                    <li>Log in to your provider dashboard</li>
+                    <li>Set up your practice profile</li>
+                    <li>Manage your availability</li>
+                    <li>Start accepting patient appointments</li>
+                </ul>
+                <div style="text-align: center;">
+                    <a href="http://localhost:5173/login" class="button">Log In Now</a>
+                </div>
+                <p>If you have any questions, please contact our support team.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return await self.send_email(email, "Welcome to AfyaLink - Your Account Has Been Approved", html_content)
+
+async def send_doctor_rejection_email(self, email: str, full_name: str, reason: str = None) -> bool:
+    """Send email to doctor when rejected"""
+    reason_text = f"<p><strong>Reason:</strong> {reason}</p>" if reason else ""
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Application Status - AfyaLink</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: #dc2626; color: white; padding: 20px; text-align: center; }}
+            .content {{ padding: 30px; background: #f9f9f9; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Application Update</h1>
+            </div>
+            <div class="content">
+                <p>Dear Dr. {full_name},</p>
+                <p>Thank you for your interest in joining AfyaLink. After careful review of your application, we regret to inform you that we are unable to approve your application at this time.</p>
+                {reason_text}
+                <p>If you have any questions or would like to appeal this decision, please contact our support team.</p>
+                <p>Thank you for your understanding.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return await self.send_email(email, "Update on Your AfyaLink Application", html_content)
 
 # Create singleton instance
 email_service = EmailService()

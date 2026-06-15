@@ -1,33 +1,46 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List
 from ..database import get_db
-from ..models.user import User
+from ..models.user import User, UserStatus, UserRole
 from .security import decode_token
+import logging
 
-security = HTTPBearer()
+logger = logging.getLogger(__name__)
+
+security = HTTPBearer(auto_error=False)
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
     db: Session = Depends(get_db)
 ) -> User:
     """Get current authenticated user"""
-    token = credentials.credentials
-    payload = decode_token(token)
     
-    if not payload or payload.get("type") != "access":
+    token = None
+    if credentials:
+        token = credentials.credentials
+    
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    payload = decode_token(token)
+    if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
         )
     
     user_id = payload.get("sub")
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
+            detail="Invalid token payload",
         )
     
     user = db.query(User).filter(User.id == int(user_id)).first()
@@ -37,32 +50,25 @@ async def get_current_user(
             detail="User not found",
         )
     
-    if user.status != "active":
+    # FIXED: Compare with enum values, not strings
+    if user.role != UserRole.ADMIN and user.status != UserStatus.ACTIVE:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Account is not active",
+            detail=f"Account is not active. Status: {user.status.value if hasattr(user.status, 'value') else user.status}",
         )
     
     return user
 
-async def get_current_active_user(
-    current_user: User = Depends(get_current_user),
-) -> User:
-    """Get current active user"""
-    if current_user.status != "active":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Inactive user"
-        )
-    return current_user
-
-def role_required(*allowed_roles):
+def role_required(*allowed_roles: List[str]):
     """Role-based access control decorator"""
-    async def role_checker(current_user: User = Depends(get_current_active_user)):
-        if current_user.role not in allowed_roles:
+    async def role_checker(current_user: User = Depends(get_current_user)):
+        # Get the role value as string
+        user_role = current_user.role.value if hasattr(current_user.role, 'value') else str(current_user.role)
+        
+        if user_role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Role {current_user.role} not authorized for this operation"
+                detail=f"Role '{user_role}' not authorized. Allowed roles: {allowed_roles}"
             )
         return current_user
     return role_checker

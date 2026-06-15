@@ -5,7 +5,8 @@ from .appointments import router as appointments_router
 from .doctors import router as doctors_router
 from .records import router as records_router
 from .payments import router as payments_router
-
+from .admin import router as admin_router
+from .reviews import router as reviews_router
 router = APIRouter(prefix="/api/v1")
 
 router.include_router(auth_router)
@@ -14,3 +15,5 @@ router.include_router(appointments_router)
 router.include_router(doctors_router)
 router.include_router(records_router)
 router.include_router(payments_router)
+router.include_router(admin_router)
+router.include_router(reviews_router)
