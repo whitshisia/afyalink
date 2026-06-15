@@ -15,6 +15,9 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
+class LogoutRequest(BaseModel):
+    refresh_token: Optional[str] = None
+    
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
 

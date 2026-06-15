@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 import secrets
 from ..database import get_db
@@ -117,7 +117,7 @@ async def refresh_token(refresh_data: RefreshTokenRequest, db: Session = Depends
         RefreshToken.is_revoked == False
     ).first()
     
-    if not db_token or db_token.expires_at < datetime.utcnow():
+    if not db_token or db_token.expires_at < datetime.now(timezone.utc):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired refresh token"
@@ -159,40 +159,61 @@ async def refresh_token(refresh_data: RefreshTokenRequest, db: Session = Depends
         "token_type": "bearer"
     }
 
+class LogoutRequest(BaseModel):
+    refresh_token: Optional[str] = None
+
 @router.post("/logout")
 async def logout(
-    refresh_token: str,
+    logout_data: LogoutRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Logout user and revoke refresh token"""
-    db_token = db.query(RefreshToken).filter(
-        RefreshToken.token == refresh_token,
-        RefreshToken.user_id == current_user.id
-    ).first()
     
-    if db_token:
-        db_token.is_revoked = True
-        db.commit()
+    if logout_data.refresh_token:
+        # Find and revoke the refresh token
+        db_token = db.query(RefreshToken).filter(
+            RefreshToken.token == logout_data.refresh_token,
+            RefreshToken.user_id == current_user.id,
+            RefreshToken.is_revoked == False
+        ).first()
+        
+        if db_token:
+            db_token.is_revoked = True
+            db.commit()
     
     return {"message": "Successfully logged out"}
 
-@router.post("/verify-email/{user_id}/{token}")
-async def verify_email(user_id: int, token: str, db: Session = Depends(get_db)):
+@router.get("/verify-email/{user_id}/{token}")
+async def verify_email(
+    user_id: int, 
+    token: str, 
+    db: Session = Depends(get_db)
+):
     """Verify user's email address"""
-    # In production, you'd store verification tokens in database
-    # For now, we'll just mark as verified
+    # Find the user
     user = db.query(User).filter(User.id == user_id).first()
+    
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # In production, you would verify the token here
+    # For now, just mark as verified
+    
     user.is_verified = True
-    if user.status == "pending_verification":
+    
+    # Auto-activate patients after email verification
+    if user.role == "patient":
         user.status = "active"
     
     db.commit()
     
-    return {"message": "Email verified successfully"}
+    # Return a success page or redirect
+    return {
+        "message": "Email verified successfully", 
+        "email": user.email,
+        "status": user.status
+    }
 
 @router.post("/change-password")
 async def change_password(
@@ -201,13 +222,25 @@ async def change_password(
     db: Session = Depends(get_db)
 ):
     """Change user's password"""
+    # Verify current password
     if not verify_password(password_data.current_password, current_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Current password is incorrect"
         )
     
+    # Hash new password
     current_user.hashed_password = get_password_hash(password_data.new_password)
+    
+    # Revoke all refresh tokens (force re-login)
+    tokens = db.query(RefreshToken).filter(
+        RefreshToken.user_id == current_user.id,
+        RefreshToken.is_revoked == False
+    ).all()
+    
+    for token in tokens:
+        token.is_revoked = True
+    
     db.commit()
     
     return {"message": "Password changed successfully"}

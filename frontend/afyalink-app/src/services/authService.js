@@ -17,11 +17,17 @@ export const authService = {
   
   logout: async () => {
     const refreshToken = localStorage.getItem('refresh_token');
-    if (refreshToken) {
-      await api.post('/auth/logout', { refresh_token: refreshToken });
+    try {
+      if (refreshToken) {
+        // Send refresh_token in request body (not query params)
+        await api.post('/auth/logout', { refresh_token: refreshToken });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
     }
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
   },
   
   getCurrentUser: async () => {

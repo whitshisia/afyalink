@@ -60,11 +60,10 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   // Skip non-GET requests
-  if (request.method !== 'GET') {
+  if (request.method !== 'GET' || url.protocol === 'chrome-extension:') {
     event.respondWith(fetch(request));
     return;
   }
-
   // Handle API requests
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(handleApiRequest(request));
