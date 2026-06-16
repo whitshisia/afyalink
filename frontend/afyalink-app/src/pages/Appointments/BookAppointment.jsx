@@ -23,12 +23,10 @@ const BookAppointment = () => {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState([]);
 
-  // Fetch doctors on load
   useEffect(() => {
     loadDoctors();
   }, []);
 
-  // Check for doctor ID in URL params
   useEffect(() => {
     const doctorId = searchParams.get('doctor');
     if (doctorId && doctors.length > 0) {
@@ -53,8 +51,7 @@ const BookAppointment = () => {
   };
 
   const loadAvailableSlots = async (doctorId, date) => {
-    // In production, fetch from API
-    // For now, generate mock slots
+    
     const mockSlots = [
       '09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM',
       '11:30 AM', '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM'
@@ -100,13 +97,11 @@ const BookAppointment = () => {
     };
 
     try {
-      // Try to book online first
       const response = await appointmentService.create(appointmentData);
       toast.success('Appointment booked successfully!');
       navigate('/appointments');
     } catch (error) {
       if (!navigator.onLine) {
-        // Save for offline sync
         await saveOfflineAppointment(appointmentData);
         toast.success('Appointment saved offline. Will sync when you\'re back online.');
         navigate('/appointments');

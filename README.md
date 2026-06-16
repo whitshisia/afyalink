@@ -349,12 +349,6 @@ cd frontend/afyalink-app
 npm run dev
 ```
 
-#### Terminal 3: Redis (if not using Docker)
-
-```bash
-redis-server
-```
-
 ### Access the Application
 
 | Service | URL |
@@ -364,7 +358,6 @@ redis-server
 | API Documentation | http://localhost:8000/docs |
 | ReDoc Documentation | http://localhost:8000/redoc |
 | PostgreSQL | localhost:5432 |
-| Redis | localhost:6379 |
 
 ---
 
@@ -464,35 +457,6 @@ AfyaLink is a fully functional Progressive Web App (PWA) with:
 
 ---
 
-## 🧪 Testing
-
-### Backend Tests
-
-```bash
-cd backend/afyalink-api
-pytest
-pytest --cov=app tests/
-```
-
-### Frontend Tests
-
-```bash
-cd frontend/afyalink-app
-npm test
-npm run test:coverage
-```
-
-### End-to-End Tests
-
-```bash
-# Install Cypress
-npm install -g cypress
-
-# Run E2E tests
-cypress run
-```
-
----
 
 ## 🚢 Deployment
 
@@ -525,16 +489,6 @@ vercel --prod
 
 # Deploy to Netlify:
 netlify deploy --prod
-```
-
-### Docker Production Build
-
-```bash
-# Build production image
-docker build -t afyalink:latest -f Dockerfile.prod .
-
-# Run container
-docker run -d -p 8000:8000 --env-file .env.prod afyalink:latest
 ```
 
 ### Nginx Configuration
@@ -659,19 +613,14 @@ We welcome contributions! Please follow these steps:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 📞 Contact
 
-**AfyaLink Technologies Ltd.**
-
-- 📧 Email: hello@afyalink.com
-- 📞 Phone: +254 700 000 000
-- 🌐 Website: https://afyalink.com
-- 🐦 Twitter: [@AfyaLink](https://twitter.com/afyalink)
-- 💼 LinkedIn: [AfyaLink](https://linkedin.com/company/afyalink)
+- 📧 Email: shisiawhitney215@gmail.com
+- 📞 Phone: +254 7011506494
 
 ### Support
 
@@ -701,7 +650,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Made with ❤️ by the AfyaLink Team**
+**Made with ❤️ by Whitney Shisia**
 
 *Your Health, Connected*
 

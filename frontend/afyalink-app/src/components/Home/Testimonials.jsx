@@ -11,7 +11,6 @@ const Testimonials = () => {
 
   const loadFeaturedReviews = async () => {
     try {
-      // Try to fetch from API
       const doctors = await doctorService.getAll({ limit: 3 });
       const allReviews = [];
       
@@ -33,7 +32,6 @@ const Testimonials = () => {
       if (allReviews.length > 0) {
         setReviews(allReviews.slice(0, 3));
       } else {
-        // Use fallback data
         setReviews([
           {
             rating: 5,
@@ -60,7 +58,6 @@ const Testimonials = () => {
       }
     } catch (error) {
       console.error('Failed to load reviews:', error);
-      // Use fallback data on error
       setReviews([
         {
           rating: 5,

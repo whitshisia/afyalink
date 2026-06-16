@@ -37,6 +37,9 @@ import ChangePassword from './pages/Profile/ChangePassword';
 import NotificationSettings from './pages/Profile/NotificationSettings';
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboard from './pages/Admin/AdminDashboard';
+import PatientsPage from './pages/PatientsPage';
+import EnterprisePage from './pages/EnterprisePage'; 
+
 function App() {
   const { loadUser } = useAuthStore();
 
@@ -67,6 +70,8 @@ function App() {
         <Route path="/blog" element={<Layout><BlogPage /></Layout>} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/patients" element={<Layout><PatientsPage /></Layout>} />
+        <Route path="/enterprise" element={<Layout><EnterprisePage /></Layout>} />
         
         {/* Protected Dashboard Routes */}
         <Route path="/dashboard" element={

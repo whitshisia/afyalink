@@ -230,7 +230,6 @@ const Hero = () => {
               </div>
             </div>
 
-            {/* Floating Card 2 - AI Assistant */}
             <div className="absolute -top-4 -right-2 lg:top-[-20px] lg:right-[-24px] bg-white rounded-[18px] shadow-lg border border-gray-100 p-3 hidden sm:block animate-[float_5.5s_1s_ease-in-out_infinite] z-10">
               <div className="w-7 h-7 bg-brand-50 rounded-lg flex items-center justify-center mb-1.5">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 stroke-brand-600">

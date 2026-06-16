@@ -10,7 +10,6 @@ export function ProtectedRoute({ allowedRoles }) {
   }
 
   if (allowedRoles && !allowedRoles.includes(user?.role)) {
-    // Redirect to the right dashboard based on actual role
     const redirect = user?.role === "doctor" ? "/provider" : "/dashboard";
     return <Navigate to={redirect} replace />;
   }

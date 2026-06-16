@@ -38,7 +38,7 @@ const PatientDashboard = () => {
         totalAppointments: appointments.length,
         completedAppointments: completed.length,
         upcomingAppointments: upcoming.length,
-        totalSpent: 0 // Calculate from payments
+        totalSpent: 0 
       });
     } catch (error) {
       console.error('Failed to load dashboard data:', error);

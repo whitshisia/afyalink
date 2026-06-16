@@ -4,7 +4,6 @@ import Footer from '../Footer';
 
 const Layout = ({ children }) => {
   useEffect(() => {
-    // Scroll reveal observer
     const reveals = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {

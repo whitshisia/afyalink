@@ -63,10 +63,8 @@ const Dashboard = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // Load appointments
       const appointments = await appointmentService.getAll();
       
-      // Calculate stats based on user role
       const now = new Date();
       const upcoming = appointments.filter(apt => 
         new Date(apt.scheduled_time) > now && apt.status !== 'cancelled'
@@ -87,7 +85,6 @@ const Dashboard = () => {
       
       setUpcomingAppointments(upcoming.slice(0, 5));
       
-      // Generate recent activity
       const activity = [];
       if (upcoming.length > 0) {
         activity.push({
@@ -111,7 +108,6 @@ const Dashboard = () => {
       }
       setRecentActivity(activity);
       
-      // Mock notifications
       setNotifications([
         {
           id: 1,

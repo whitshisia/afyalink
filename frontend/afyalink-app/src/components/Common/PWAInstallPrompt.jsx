@@ -6,7 +6,6 @@ const PWAInstallPrompt = () => {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
-    // Check if app is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
       return;
@@ -15,9 +14,7 @@ const PWAInstallPrompt = () => {
     const handler = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      // Don't show immediately, wait a bit
       setTimeout(() => {
-        // Check if user dismissed before
         const dismissed = localStorage.getItem('pwa-dismissed');
         if (!dismissed && !isInstalled) {
           setShowPrompt(true);
@@ -27,7 +24,6 @@ const PWAInstallPrompt = () => {
 
     window.addEventListener('beforeinstallprompt', handler);
     
-    // Check if app is installed
     window.addEventListener('appinstalled', () => {
       setIsInstalled(true);
       setShowPrompt(false);
