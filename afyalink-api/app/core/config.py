@@ -18,23 +18,24 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     
     # Email
-    SMTP_HOST: str
-    SMTP_PORT: int
-    SMTP_USER: str
-    SMTP_PASSWORD: str
-    SMTP_FROM: str
-    
+    SMTP_HOST=smtp.gmail.com
+    SMTP_PORT=465
+    SMTP_USER=shisiawhitney215@gmail.com
+    SMTP_PASSWORD=bnxynidwkcajqqua
+    SMTP_FROM=AfyaLink <noreply@afyalink.com>
+        
     # M-Pesa
-    MPESA_ENVIRONMENT: str = "sandbox"
-    MPESA_CONSUMER_KEY: str
-    MPESA_CONSUMER_SECRET: str
-    MPESA_PASSKEY: str
-    MPESA_SHORTCODE: str
-    MPESA_CALLBACK_URL: str
+    MPESA_ENVIRONMENT=sandbox
+    MPESA_CONSUMER_KEY=ynr0QGt5EDAHkBafrJvyFWjFKqJTQrvTWwDTGlk7WwZO2QMz
+    MPESA_CONSUMER_SECRET=YjnP6vnTkRbdGDkxEtY6lbFyThHhk9eA0xBvry4HqbKfHUZ2tRsaRXzJR6duN4Zj
+    MPESA_PASSKEY=your-passkey
+    MPESA_SHORTCODE=174379
+    MPESA_CALLBACK_URL=https://your-domain.com/api/v1/payments/mpesa-callback
+
     
     # Stripe
-    STRIPE_SECRET_KEY: str
-    STRIPE_WEBHOOK_SECRET: str
+    STRIPE_SECRET_KEY=sk_test_51Th3Ah5g17PE31PyClg8H6iGX9UmcK3kChsmrzULWDiAYq22mC3L2gAMZi4W8KjIY2cvKsFRmFMwFqcUKNOcM02c00lDdkyPrQ
+    STRIPE_WEBHOOK_SECRET=mock
     
     # Cloudinary
     # CLOUDINARY_CLOUD_NAME: str
