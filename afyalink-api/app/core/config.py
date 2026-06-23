@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     SMTP_PORT=465
     SMTP_USER=shisiawhitney215@gmail.com
     SMTP_PASSWORD=bnxynidwkcajqqua
-    SMTP_FROM=AfyaLink <noreply@afyalink.com>
+    SMTP_FROM=noreply@afyalink.com
         
     # M-Pesa
     MPESA_ENVIRONMENT=sandbox
