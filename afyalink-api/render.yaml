@@ -1,0 +1,19 @@
+services:
+  # 1. Your FastAPI/Python Backend Web Service
+  - type: web
+    name: afyalink-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0 # Match your local python version
+      - fromDatabase:
+          name: afyalink-db
+          property: connectionString
+        key: DATABASE_URL
+
+# 2. Your Render PostgreSQL Database
+databases:
+  - name: afyalink-db
+    plan: free # Change to "starter" if you need a paid tier later

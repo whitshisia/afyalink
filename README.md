@@ -1,8 +1,3 @@
-Here's the professional README.md file for your AfyaLink project:
-
-**`README.md`**
-
-```markdown
 # AfyaLink - Smart Healthcare Platform
 
 <div align="center">
@@ -655,4 +650,3 @@ This project is licensed under the Apache License - see the [LICENSE](LICENSE) f
 *Your Health, Connected*
 
 </div>
-```
