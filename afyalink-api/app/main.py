@@ -36,11 +36,11 @@ app.add_middleware(
 # Add trusted host middleware
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["*"]  # Configure this in production
+    allowed_hosts=["*"] 
 )
 
 # Include routers
-app.include_router(router)
+app.include_router(router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
