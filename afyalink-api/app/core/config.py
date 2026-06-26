@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "AfyaLink"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
-    CORS_ORIGINS: str = '["http://localhost:5173"]'
+    CORS_ORIGINS: str = '["http://localhost:5173", "https://onrender.com"]'
     
     @property
     def cors_origins_list(self) -> List[str]:
