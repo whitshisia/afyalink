@@ -3,15 +3,7 @@ from pydantic_settings import BaseSettings
 from pydantic import ConfigDict, field_validator
 import json
 import os
-import logging
 
-try:
-    from passlib.handlers.bcrypt import bcrypt
-    # Safely truncate or encode the underlying byte strings
-    bcrypt._calc_checksum = lambda secret, config: bcrypt._backend._hashpw(secret, config)
-except Exception:
-    logging.warning("Passlib bcrypt patch could not be applied.")
-    
 class Settings(BaseSettings):
     # Database
     DATABASE_URL: Optional[str] = None
@@ -23,7 +15,6 @@ class Settings(BaseSettings):
         if v and v.startswith("postgres://"):
             return v.replace("postgres://", "postgresql://", 1)
         return v
-    
     
     # Security
     SECRET_KEY: str = "becedb80ea9d0f5617b0933e83186531ef7f91d6e8ce08aa8c372b7cd16d9a3c"
